@@ -3,34 +3,39 @@ import datetime as dt
 from collections import defaultdict
 from pathlib import Path
 
+
 BASE_DIR = Path(__file__).parent.parent
 DATETIME_FORMAT = '%Y-%m-%d_%H-%M-%S'
+FILENAME = 'status_summary_{now_format}.csv'
 
 
 class PepParsePipeline:
     def __init__(self):
-        self.results = defaultdict(int)
+        # при использовании константы на уровне модуля падает тест
+        # tests/test_main.py:51:
+        self.result_dir = BASE_DIR / 'results'
+        self.result_dir.mkdir(exist_ok=True)
 
     def open_spider(self, spider):
-        results_dir = BASE_DIR / 'results'
-        results_dir.mkdir(exist_ok=True)
-        now = dt.datetime.now()
-        now_format = now.strftime(DATETIME_FORMAT)
-        filename = f'status_summary_{now_format}.csv'
-        self.file_path = results_dir / filename
+        self.results = defaultdict(int)
 
     def process_item(self, item, spider):
-        status = item['status']
-        self.results[status] += 1
+        self.results[item['status']] += 1
         return item
 
     def close_spider(self, spider):
-        with open(self.file_path, 'w', encoding='utf-8') as f:
-            writer = csv.writer(f, dialect='unix')
-            writer.writerows(
-                [
-                    ('Статус', 'Количество'),
-                    *self.results.items(),
-                    ('Total', sum(self.results.values()))
-                ]
+        now = dt.datetime.now()
+        now_format = now.strftime(DATETIME_FORMAT)
+        filename = FILENAME.format(now_format=now_format)
+        file_path = self.result_dir / filename
+        with open(file_path, 'w', encoding='utf-8') as csvfile:
+            writer = csv.writer(
+                csvfile,
+                dialect='excel-tab',
+                quoting=csv.QUOTE_MINIMAL
             )
+            writer.writerows([
+                ('Статус', 'Количество'),
+                *self.results.items(),
+                ('Total', sum(self.results.values()))
+            ])
