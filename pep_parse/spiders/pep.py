@@ -18,7 +18,7 @@ class PepSpider(scrapy.Spider):
         pep = response.css('ul.breadcrumbs > li + li + li::text').get()
         data = {
             'number': int(pep.replace('PEP ', '')),
-            'name': pep.replace(f'{pep} – ', ''),
+            'name': response.css('#pep-content h1.page-title::text').get(),
             'status': response.css('dt:contains("Status") + dd::text').get()
         }
 
