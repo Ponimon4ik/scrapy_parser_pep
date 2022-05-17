@@ -49,4 +49,4 @@ scrapy crawl pep
 статусе и сохранит результат сбора информации в папку results
 
 ### Автор:
-+ Стефанюк Богдан
++ Стефанюк Богдан - [Ponimon4ik](https://github.com/Ponimon4ik)

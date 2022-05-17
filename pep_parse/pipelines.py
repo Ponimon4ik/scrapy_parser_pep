@@ -11,8 +11,6 @@ FILENAME = 'status_summary_{now_format}.csv'
 
 class PepParsePipeline:
     def __init__(self):
-        # при использовании константы на уровне модуля падает тест
-        # tests/test_main.py:51:
         self.result_dir = BASE_DIR / 'results'
         self.result_dir.mkdir(exist_ok=True)
 
@@ -31,7 +29,7 @@ class PepParsePipeline:
         with open(file_path, 'w', encoding='utf-8') as csvfile:
             writer = csv.writer(
                 csvfile,
-                dialect='excel-tab',
+                dialect=csv.unix_dialect,
                 quoting=csv.QUOTE_MINIMAL
             )
             writer.writerows([
